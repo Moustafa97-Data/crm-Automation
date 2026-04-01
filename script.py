@@ -3,6 +3,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 from datetime import datetime
+import os
+import json
 
 app = Flask(__name__)
 
@@ -10,18 +12,15 @@ app = Flask(__name__)
 def run_script():
 
     # ===== Connect =====
-scope = [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive"
-]
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/drive"
+    ]
 
-import os
-import json
+    creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
-creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
-creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-
-client = gspread.authorize(creds)
+    client = gspread.authorize(creds)
 
     spreadsheet = client.open("Automated CRM Sheets")
     sheet = spreadsheet.worksheet("Leads")
@@ -41,22 +40,14 @@ client = gspread.authorize(creds)
         .str.lower()
     )
 
-    # ===== Column Indexes =====
-    lead_id_col = headers.index("Lead_ID")
-    email_col = headers.index("Email")
-    created_col = headers.index("Created_At")
-    score_col = headers.index("Score")
-
     # ===== Handle IDs + Created At =====
     id_values = []
     created_values = []
 
     for i, row in df.iterrows():
-
         lead_id = row['lead_id']
         email = row['email']
 
-        # 🆔 Generate ID لو مش موجود
         if not lead_id and email:
             new_id = f"L-{int(datetime.now().timestamp())}-{i+2}"
         else:
@@ -64,13 +55,12 @@ client = gspread.authorize(creds)
 
         id_values.append([new_id])
 
-        # 🕒 Created At
         if not row['created_at'] and email:
             created_values.append([datetime.now().strftime("%Y-%m-%d")])
         else:
             created_values.append([row['created_at']])
 
-    # ===== Score Logic =====
+    # ===== Score =====
     df['last_activity'] = pd.to_datetime(df['last_activity'], errors='coerce')
 
     today = datetime.now()
@@ -100,12 +90,10 @@ client = gspread.authorize(creds)
 
     score_values = [[int(val)] for val in df['score']]
 
-    # ===== Bulk Update 💣 =====
-    sheet.update(id_values, f'A2:A{len(id_values)+1}')        # Lead_ID
-    sheet.update(created_values, f'H2:H{len(created_values)+1}')  # Created_At
-    sheet.update(score_values, f'G2:G{len(score_values)+1}')  # Score
-
-    print("Full system updated 🚀")
+    # ===== Update =====
+    sheet.update(id_values, f'A2:A{len(id_values)+1}')
+    sheet.update(created_values, f'H2:H{len(created_values)+1}')
+    sheet.update(score_values, f'G2:G{len(score_values)+1}')
 
     return "Done ✅"
 
