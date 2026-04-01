@@ -1,4 +1,3 @@
-from flask import Flask
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
@@ -6,9 +5,6 @@ from datetime import datetime
 import os
 import json
 
-app = Flask(__name__)
-
-@app.route('/run', methods=['GET'])
 def run_script():
 
     # ===== Connect =====
@@ -95,7 +91,5 @@ def run_script():
     sheet.update(created_values, f'H2:H{len(created_values)+1}')
     sheet.update(score_values, f'G2:G{len(score_values)+1}')
 
-    return "Done ✅"
-
-
-app.run(host="0.0.0.0", port=5000)
+if __name__ == "__main__":
+    run_script()
