@@ -15,8 +15,12 @@ def run_script():
         "https://www.googleapis.com/auth/drive"
     ]
 
-    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-    client = gspread.authorize(creds)
+     import os
+     import json
+
+     creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
+     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+     client = gspread.authorize(creds)
 
     spreadsheet = client.open("Automated CRM Sheets")
     sheet = spreadsheet.worksheet("Leads")
