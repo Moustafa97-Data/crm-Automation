@@ -10,15 +10,17 @@ app = Flask(__name__)
 def run_script():
 
     # ===== Connect =====
-    scope = [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/drive"
-    ]
+scope = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+]
+
 import os
 import json
 
 creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+
 client = gspread.authorize(creds)
 
     spreadsheet = client.open("Automated CRM Sheets")
