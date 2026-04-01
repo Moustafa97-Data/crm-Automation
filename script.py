@@ -14,9 +14,8 @@ def run_script():
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive"
     ]
-
-     import os
-     import json
+import os
+import json
 
      creds_dict = json.loads(os.environ['GOOGLE_CREDS'])
      creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
