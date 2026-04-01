@@ -1,4 +1,4 @@
-name: CRM Automation
+name: run
 
 on:
   workflow_dispatch:
@@ -6,6 +6,9 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_CREDS: ${{ secrets.GOOGLE_CREDS }}
 
     steps:
       - name: Checkout
@@ -17,7 +20,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install packages
-        run: pip install -r requirements.txt
+        run: pip install gspread pandas oauth2client
 
       - name: Run script
         run: python script.py
