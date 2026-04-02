@@ -7,6 +7,7 @@ import json
 
 def run_script():
 
+    # ===== Connect =====
     scope = [
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive"
@@ -16,7 +17,6 @@ def run_script():
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 
     client = gspread.authorize(creds)
-
     sheet = client.open("Automated CRM Sheets").worksheet("Leads")
 
     # ===== Read =====
@@ -33,15 +33,17 @@ def run_script():
         .str.lower()
     )
 
-    # ===== Vectorized ID + Created ===== 💣
+    # ===== Vectorized updates 💣 =====
     now_ts = int(datetime.now().timestamp())
     today_str = datetime.now().strftime("%Y-%m-%d")
 
+    # Lead ID
     df['lead_id'] = df.apply(
         lambda r: f"L-{now_ts}-{r.name+2}" if not r['lead_id'] and r['email'] else r['lead_id'],
         axis=1
     )
 
+    # Created At
     df['created_at'] = df.apply(
         lambda r: today_str if not r['created_at'] and r['email'] else r['created_at'],
         axis=1
@@ -73,16 +75,13 @@ def run_script():
 
     df['score'] = df.apply(calculate_score, axis=1)
 
-    # ===== 💣 Update مرة واحدة (أهم تحسين) =====
-    update_data = df[['lead_id', 'score', 'created_at']].values.tolist()
+    # ===== 💣 Build full sheet data =====
+    updated_rows = df.values.tolist()
 
-    # A, G, H
-    for i, row in enumerate(update_data, start=2):
-        sheet.update(f"A{i}:A{i}", [[row[0]]])
-        sheet.update(f"G{i}:G{i}", [[int(row[1])]])
-        sheet.update(f"H{i}:H{i}", [[row[2]]])
+    # ===== 💣 Update مرة واحدة فقط =====
+    sheet.update([headers] + updated_rows)
 
-    print("Optimized update done 🚀")
+    print("🚀 ULTRA FAST update done")
 
 
 if __name__ == "__main__":
