@@ -86,14 +86,13 @@ def run_script():
     "created_at",
     "last_activity"
 ]
+    df = df[columns_order]
 
-df = df[columns_order]
+    df = df.fillna("").astype(str)
 
-df = df.fillna("").astype(str)
+    updated_rows = df.values.tolist()
 
-updated_rows = df.values.tolist()
-
-sheet.update([columns_order] + updated_rows)
+    sheet.update([columns_order] + updated_rows)
 
 
 
