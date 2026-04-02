@@ -83,8 +83,6 @@ updated_rows = df.values.tolist()
 # ===== 💣 Update مرة واحدة =====
 sheet.update([headers] + updated_rows)
 
-    print("🚀 ULTRA FAST update done")
-
 
 if __name__ == "__main__":
     run_script()
