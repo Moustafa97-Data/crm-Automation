@@ -75,12 +75,25 @@ def run_script():
 
     df['score'] = df.apply(calculate_score, axis=1)
     # ===== 💣 Build full sheet data =====
-    df = df.astype(str)
+    columns_order = [
+    "lead_id",
+    "name",
+    "email",
+    "phone",
+    "source",
+    "status",
+    "score",
+    "created_at",
+    "last_activity"
+]
 
-    updated_rows = df.values.tolist()
+df = df[columns_order]
 
-    # ===== 💣 Update مرة واحدة =====
-    sheet.update([headers] + updated_rows)
+df = df.fillna("").astype(str)
+
+updated_rows = df.values.tolist()
+
+sheet.update([columns_order] + updated_rows)
 
 
 
