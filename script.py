@@ -74,14 +74,14 @@ def run_script():
         return max(score, 0)
 
     df['score'] = df.apply(calculate_score, axis=1)
+    # ===== 💣 Build full sheet data =====
+    df = df.astype(str)
 
-  # ===== 💣 Build full sheet data =====
-df = df.astype(str)  # 🔥 الحل هنا
+    updated_rows = df.values.tolist()
 
-updated_rows = df.values.tolist()
+    # ===== 💣 Update مرة واحدة =====
+    sheet.update([headers] + updated_rows)
 
-# ===== 💣 Update مرة واحدة =====
-sheet.update([headers] + updated_rows)
 
 
 if __name__ == "__main__":
