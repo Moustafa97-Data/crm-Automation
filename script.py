@@ -75,11 +75,13 @@ def run_script():
 
     df['score'] = df.apply(calculate_score, axis=1)
 
-    # ===== 💣 Build full sheet data =====
-    updated_rows = df.values.tolist()
+  # ===== 💣 Build full sheet data =====
+df = df.astype(str)  # 🔥 الحل هنا
 
-    # ===== 💣 Update مرة واحدة فقط =====
-    sheet.update([headers] + updated_rows)
+updated_rows = df.values.tolist()
+
+# ===== 💣 Update مرة واحدة =====
+sheet.update([headers] + updated_rows)
 
     print("🚀 ULTRA FAST update done")
 
